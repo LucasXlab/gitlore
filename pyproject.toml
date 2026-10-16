@@ -32,9 +32,9 @@ dev = ["pytest>=8.0.0", "openai>=1.0.0"]
 gitlore = "gitlore.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/gitlore/gitlore"
-Repository = "https://github.com/gitlore/gitlore"
-Documentation = "https://github.com/gitlore/gitlore#readme"
+Homepage = "https://github.com/LucasYanzy/gitlore"
+Repository = "https://github.com/LucasYanzy/gitlore"
+Documentation = "https://github.com/LucasYanzy/gitlore#readme"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gitlore"]

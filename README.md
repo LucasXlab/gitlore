@@ -2,13 +2,13 @@
   <h1 align="center">GitLore</h1>
   <p align="center"><b>Visualize your codebase's story from git history — churn, complexity hotspots, contributors, and timeline. Zero config.</b></p>
   <p align="center">
-    <a href="https://github.com/gitlore/gitlore/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+    <a href="https://github.com/LucasYanzy/gitlore/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
     <a href="https://pypi.org/project/gitlore/"><img alt="PyPI" src="https://img.shields.io/pypi/v/gitlore.svg"></a>
-    <a href="https://github.com/gitlore/gitlore/actions"><img alt="CI" src="https://github.com/gitlore/gitlore/actions/workflows/ci.yml/badge.svg"></a>
+    <a href="https://github.com/LucasYanzy/gitlore/actions"><img alt="CI" src="https://github.com/LucasYanzy/gitlore/actions/workflows/ci.yml/badge.svg"></a>
   </p>
 </p>
 
-![GitLore terminal demo](https://raw.githubusercontent.com/gitlore/gitlore/main/assets/demo.gif)
+![GitLore terminal demo](https://raw.githubusercontent.com/gitlore/gitlore/main/assets/demo.svg)
 
 ## Install
 
@@ -125,7 +125,7 @@ by default. For very large histories, `--since` or `--max-count` narrow the scop
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Good first issues are tagged
-[`good first issue`](https://github.com/gitlore/gitlore/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+[`good first issue`](https://github.com/LucasYanzy/gitlore/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 
 ## License
 

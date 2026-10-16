@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="540" viewBox="0 0 760 540" font-family="ui-monospace, Menlo, Consolas, monospace">
+  <rect width="760" height="540" fill="#0f172a"/>
+  <rect x="0" y="0" width="760" height="34" fill="#1e293b"/>
+  <circle cx="18" cy="17" r="6" fill="#ef4444"/>
+  <circle cx="38" cy="17" r="6" fill="#eab308"/>
+  <circle cx="58" cy="17" r="6" fill="#22c55e"/>
+  <text x="250" y="22" fill="#94a3b8" font-size="13">gitlore — terminal demo</text>
+  <text x="20" y="68" fill="#38bdf8" font-size="14">$ cd my-project &#38;&#38; gitlore</text>
+  <text x="20" y="96" fill="#e2e8f0" font-size="13">GitLore — codebase story</text>
+  <text x="20" y="118" fill="#94a3b8" font-size="13">============================================================</text>
+  <text x="20" y="140" fill="#e2e8f0" font-size="13">Repository : my-project      Commits: 1,284   Authors: 9   Files: 312</text>
+  <text x="20" y="162" fill="#e2e8f0" font-size="13">Range      : 2021-03-02 → 2026-10-15</text>
+  <text x="20" y="188" fill="#e2e8f0" font-size="13">Activity (commits/week):</text>
+  <text x="20" y="210" fill="#38bdf8" font-size="18">▁▂▃▄▅▆▇█▇▆▅▄▃▄▅▆▇█▇▆▅▄▅▆▇</text>
+  <text x="20" y="242" fill="#e2e8f0" font-size="13">Top risk hotspots (churn × complexity):</text>
+  <text x="20" y="266" fill="#94a3b8" font-size="12">------------------------------------------------------------</text>
+  <text x="20" y="288" fill="#f87171" font-size="12"> 1. src/core/parser.py     risk= 312.4 commits=184  churn=9210  cx=88</text>
+  <text x="20" y="308" fill="#fb923c" font-size="12"> 2. src/core/scheduler.py  risk= 271.0 commits=156  churn=7702  cx=81</text>
+  <text x="20" y="328" fill="#fbbf24" font-size="12"> 3. src/api/handlers.py    risk= 198.3 commits=121  churn=5401  cx=64</text>
+  <text x="20" y="348" fill="#a3e635" font-size="12"> 4. src/util/cache.py      risk= 142.7 commits= 98  churn=3012  cx=55</text>
+  <text x="20" y="368" fill="#34d399" font-size="12"> 5. src/models/user.py     risk=  91.2 commits= 64  churn=1820  cx=40</text>
+  <text x="20" y="400" fill="#e2e8f0" font-size="13">Top contributors:</text>
+  <text x="20" y="422" fill="#94a3b8" font-size="12">------------------------------------------------------------</text>
+  <text x="20" y="444" fill="#e2e8f0" font-size="12">  alice     commits=412  +38412/-9120</text>
+  <text x="20" y="464" fill="#e2e8f0" font-size="12">  bob       commits=288  +21030/-4410</text>
+  <text x="20" y="484" fill="#e2e8f0" font-size="12">  carol     commits=191  +15022/-3021</text>
+  <text x="20" y="516" fill="#64748b" font-size="11">▲ 30-second demo: install with `pip install gitlore`, run in any repo, done.</text>
+</svg>

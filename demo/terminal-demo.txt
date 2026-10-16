@@ -1,0 +1,28 @@
+GitLore — codebase story
+============================================================
+Repository : .
+Commits    : 1
+Authors    : 1
+Files      : 18
+Range      : 2026-10-15 → 2026-10-15
+
+Activity (commits/week): █
+
+Top 12 risk hotspots (churn × complexity):
+------------------------------------------------------------
+ 1. src/gitlore/analysis.py                    risk=    21.4 commits=1    churn=162     cx=66
+ 2. src/gitlore/git_data.py                    risk=    20.2 commits=1    churn=152     cx=55
+ 3. src/gitlore/report.py                      risk=    19.0 commits=1    churn=132     cx=48
+ 4. src/gitlore/cli.py                         risk=    18.7 commits=1    churn=154     cx=40
+ 5. src/gitlore/tui.py                         risk=    12.6 commits=1    churn=61      cx=20
+ 6. tests/conftest.py                          risk=    11.2 commits=1    churn=48      cx=17
+ 7. tests/test_analysis.py                     risk=    10.9 commits=1    churn=37      cx=19
+ 8. src/gitlore/ai.py                          risk=     9.8 commits=1    churn=59      cx=10
+ 9. README.md                                  risk=     9.5 commits=1    churn=132     cx=6
+10. tests/test_cli.py                          risk=     9.2 commits=1    churn=39      cx=11
+11. tests/test_git_data.py                     risk=     8.4 commits=1    churn=28      cx=11
+12. tests/test_report.py                       risk=     7.1 commits=1    churn=30      cx=7
+
+Top contributors:
+------------------------------------------------------------
+  GitLore Demo                   commits=1     +1165/-0
