@@ -3,6 +3,9 @@ name: Publish to PyPI
 on:
   release:
     types: [published]
+  push:
+    tags:
+      - "v*"
 
 jobs:
   publish:
@@ -19,7 +22,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip build
           python -m build
-      - name: Publish to PyPI
+      - name: Publish to PyPI (Trusted Publishing)
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+        # No token required if PyPI Trusted Publisher is configured for this repo.
+        # Otherwise set the PYPI_API_TOKEN repository secret.
