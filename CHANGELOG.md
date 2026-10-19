@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `--diff RANGE` pre-merge review: ranks the files in a git range by
+  "review attention" (change size × historical risk). Supports `--json`
+  and `--html`.
+- `--skip` to extend the default ignore list.
+- `--no-color` for plain output; colored `rich` output is used automatically
+  when stdout is a terminal.
+
 ## [0.1.0] - 2026-10-16
 
 Initial public release of GitLore.

@@ -49,6 +49,27 @@ class TimelinePoint:
 
 
 @dataclass
+class DiffReviewItem:
+    path: str
+    added: int = 0
+    deleted: int = 0
+    diff_churn: int = 0  # lines changed in THIS diff
+    commits: int = 0      # historical commit count
+    complexity: int = 0
+    risk: float = 0.0
+    attention: float = 0.0  # diff_churn weighted by historical risk
+
+
+@dataclass
+class DiffReview:
+    repo: str
+    diff_range: str
+    items: list[DiffReviewItem] = field(default_factory=list)
+    total_added: int = 0
+    total_deleted: int = 0
+
+
+@dataclass
 class RepoStats:
     repo: str
     total_commits: int = 0
@@ -79,34 +100,12 @@ def estimate_complexity(path: str) -> int:
     return control + definitions * 2
 
 
-def build_stats(
-    commits: Iterable[Commit],
-    repo: str = ".",
-    top: Optional[int] = None,
-    skip_patterns: Optional[list[str]] = None,
-) -> RepoStats:
-    skip = skip_patterns or []
+def _aggregate_file_metrics(
+    commits: Iterable[Commit], repo: str, skip: list[str]
+) -> dict[str, FileMetric]:
+    """Per-file churn/complexity/risk from full history (shared by both modes)."""
     file_map: dict[str, FileMetric] = {}
-    contrib_map: dict[str, Contributor] = defaultdict(
-        lambda: Contributor(name="")
-    )
-    week_map: dict[str, int] = defaultdict(int)
-    total = 0
-    first: Optional[datetime] = None
-    last: Optional[datetime] = None
-
     for c in commits:
-        total += 1
-        if first is None or c.date < first:
-            first = c.date
-        if last is None or c.date > last:
-            last = c.date
-        contrib = contrib_map[c.author]
-        contrib.name = c.author
-        contrib.commits += 1
-        wk = c.date.isocalendar()
-        week_key = f"{wk[0]}-W{wk[1]:02d}"
-        week_map[week_key] += 1
         for ch in c.changes:
             if _should_skip(ch.path, skip):
                 continue
@@ -118,29 +117,51 @@ def build_stats(
             fm.added += ch.added
             fm.deleted += ch.deleted
             fm.churn += ch.added + ch.deleted
-            contrib.added += ch.added
-            contrib.deleted += ch.deleted
-
-    # complexity + risk (only for files still present in the working tree).
-    # Resolve file paths against the repository root so it works regardless of cwd.
     repo_root = Path(repo).resolve()
     for fm in file_map.values():
         fm.complexity = estimate_complexity(str(repo_root / fm.path))
         # risk blends how often a file changes with how hard it is to reason about
         fm.risk = fm.commits * math.log1p(fm.complexity) * math.log1p(fm.churn)
+    return file_map
+
+
+def build_stats(
+    commits: Iterable[Commit],
+    repo: str = ".",
+    top: Optional[int] = None,
+    skip_patterns: Optional[list[str]] = None,
+) -> RepoStats:
+    skip = skip_patterns or []
+    commits = list(commits)
+    file_map = _aggregate_file_metrics(commits, repo, skip)
+
+    contrib_map: dict[str, Contributor] = defaultdict(lambda: Contributor(name=""))
+    week_map: dict[str, int] = defaultdict(int)
+    first: Optional[datetime] = None
+    last: Optional[datetime] = None
+    for c in commits:
+        if first is None or c.date < first:
+            first = c.date
+        if last is None or c.date > last:
+            last = c.date
+        contrib = contrib_map[c.author]
+        contrib.name = c.author
+        contrib.commits += 1
+        wk = c.date.isocalendar()
+        week_map[f"{wk[0]}-W{wk[1]:02d}"] += 1
+        for ch in c.changes:
+            if _should_skip(ch.path, skip):
+                continue
+            contrib.added += ch.added
+            contrib.deleted += ch.deleted
 
     files = sorted(file_map.values(), key=lambda f: f.risk, reverse=True)
-    contributors = sorted(
-        contrib_map.values(), key=lambda c: c.commits, reverse=True
-    )
-    timeline = [
-        TimelinePoint(week=w, commits=n)
-        for w, n in sorted(week_map.items())
-    ]
+    contributors = sorted(contrib_map.values(), key=lambda c: c.commits, reverse=True)
+    timeline = [TimelinePoint(week=w, commits=n) for w, n in sorted(week_map.items())]
 
     stats = RepoStats(
         repo=repo,
-        total_commits=total,
+        total_commits=len(commits),
         total_authors=len(contrib_map),
         total_files=len(file_map),
         files=files,
@@ -152,6 +173,53 @@ def build_stats(
     if top:
         stats.files = stats.files[:top]
     return stats
+
+
+def build_diff_review(
+    commits: Iterable[Commit],
+    diff_files: Iterable[FileChange],
+    repo: str = ".",
+    diff_range: str = "",
+    top: Optional[int] = None,
+    skip_patterns: Optional[list[str]] = None,
+) -> DiffReview:
+    """Rank the files in a specific diff by "review attention".
+
+    attention = size of this change weighted by the file's historical risk,
+    so a big edit to a fragile file outranks a big edit to a stable one.
+    """
+    skip = skip_patterns or []
+    file_map = _aggregate_file_metrics(list(commits), repo, skip)
+    items: list[DiffReviewItem] = []
+    total_add = total_del = 0
+    for fc in diff_files:
+        if _should_skip(fc.path, skip):
+            continue
+        fm = file_map.get(fc.path)
+        item = DiffReviewItem(
+            path=fc.path,
+            added=fc.added,
+            deleted=fc.deleted,
+            diff_churn=fc.added + fc.deleted,
+            commits=fm.commits if fm else 0,
+            complexity=fm.complexity if fm else 0,
+            risk=fm.risk if fm else 0.0,
+        )
+        item.attention = item.diff_churn * (1.0 + math.log1p(item.risk))
+        items.append(item)
+        total_add += fc.added
+        total_del += fc.deleted
+    items.sort(key=lambda i: i.attention, reverse=True)
+    review = DiffReview(
+        repo=repo,
+        diff_range=diff_range,
+        items=items,
+        total_added=total_add,
+        total_deleted=total_del,
+    )
+    if top:
+        review.items = review.items[:top]
+    return review
 
 
 def _should_skip(path: str, patterns: list[str]) -> bool:

@@ -26,3 +26,15 @@ def test_get_commit_diff(sample_repo):
     # git log returns newest-first, so commits[0] is the most recent ("add b")
     diff = git_data.get_commit_diff(str(sample_repo), commits[0].hash)
     assert "b.py" in diff or "def g" in diff
+
+
+def test_get_diff_files(sample_repo):
+    files = git_data.get_diff_files(str(sample_repo), "HEAD~3..HEAD")
+    paths = {f.path for f in files}
+    assert "a.py" in paths and "b.py" in paths
+    assert all(f.added + f.deleted >= 0 for f in files)
+
+
+def test_get_diff_files_empty_range(sample_repo):
+    files = git_data.get_diff_files(str(sample_repo), "HEAD..HEAD")
+    assert files == []

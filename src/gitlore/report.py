@@ -67,6 +67,135 @@ def text_summary(stats: RepoStats, top: int = 15) -> str:
     return "\n".join(lines)
 
 
+def text_diff_review(review: "DiffReview", top: int = 15) -> str:
+    lines = [
+        f"GitLore — pre-merge review of {review.diff_range}",
+        "=" * 60,
+        f"Files changed: {len(review.items)}  +{review.total_added}/-{review.total_deleted}",
+        "",
+        f"Top {top} files to review (attention = change size × historical risk):",
+        "-" * 60,
+    ]
+    for i, it in enumerate(review.items[:top], 1):
+        lines.append(
+            f"{i:>2}. {it.path[:40]:<40} attn={it.attention:8.1f} "
+            f"+{it.added}/-{it.deleted} commits={it.commits} cx={it.complexity}"
+        )
+    return "\n".join(lines)
+
+
+def _risk_style(value: float, lo: float, hi: float) -> str:
+    if hi <= lo:
+        return "green"
+    r = (value - lo) / (hi - lo)
+    if r > 0.75:
+        return "bold red"
+    if r > 0.5:
+        return "orange3"
+    if r > 0.25:
+        return "yellow"
+    return "green"
+
+
+def render_summary(stats: RepoStats, top: int = 15):
+    """Rich renderable of the full codebase story (colored)."""
+    from rich import box
+    from rich.console import Group
+    from rich.panel import Panel
+    from rich.table import Table
+    from rich.text import Text
+
+    files = stats.files[:top]
+    lo = min((f.risk for f in files), default=0.0)
+    hi = max((f.risk for f in files), default=1.0)
+
+    head = Table.grid(padding=(0, 1))
+    head.add_row(Text(f"Repository: {stats.repo}", style="cyan"))
+    head.add_row(
+        f"Commits: {stats.total_commits}   Authors: {stats.total_authors}   Files: {stats.total_files}"
+    )
+    if stats.first_commit:
+        head.add_row(f"Range: {_fmt_dt(stats.first_commit)} → {_fmt_dt(stats.last_commit)}")
+    head.add_row(
+        Text(
+            f"Activity (commits/week): {sparkline([t.commits for t in stats.timeline])}",
+            style="blue",
+        )
+    )
+
+    tbl = Table(
+        title=f"Top {top} risk hotspots (churn × complexity)",
+        box=box.SIMPLE_HEAVY,
+        title_style="bold",
+    )
+    for col, just in (("#", "right"), ("File", "left"), ("Risk", "right"),
+                      ("Commits", "right"), ("Churn", "right"), ("Cx", "right")):
+        tbl.add_column(col, justify=just)
+    for i, f in enumerate(files, 1):
+        tbl.add_row(
+            str(i),
+            f.path,
+            Text(f"{f.risk:.1f}", style=_risk_style(f.risk, lo, hi)),
+            str(f.commits),
+            str(f.churn),
+            str(f.complexity),
+        )
+
+    ctab = Table(title="Top contributors", box=box.SIMPLE_HEAVY, title_style="bold")
+    ctab.add_column("Author")
+    ctab.add_column("Commits", justify="right")
+    ctab.add_column("Added", justify="right")
+    ctab.add_column("Deleted", justify="right")
+    for c in stats.contributors[:10]:
+        ctab.add_row(c.name, str(c.commits), f"+{c.added}", f"-{c.deleted}")
+
+    return Group(
+        Panel(head, title="GitLore — codebase story", border_style="cyan"),
+        tbl,
+        ctab,
+    )
+
+
+def render_diff_review(review: "DiffReview", top: int = 15):
+    """Rich renderable of the pre-merge review (colored)."""
+    from rich import box
+    from rich.console import Group
+    from rich.panel import Panel
+    from rich.table import Table
+    from rich.text import Text
+
+    items = review.items[:top]
+    lo = min((i.attention for i in items), default=0.0)
+    hi = max((i.attention for i in items), default=1.0)
+
+    head = Table.grid(padding=(0, 1))
+    head.add_row(Text(f"Reviewing: {review.diff_range}", style="cyan"))
+    head.add_row(
+        f"Files changed: {len(review.items)}   +{review.total_added}/-{review.total_deleted}"
+    )
+
+    tbl = Table(
+        title="Pre-merge review — look here first",
+        box=box.SIMPLE_HEAVY,
+        title_style="bold",
+    )
+    for col, just in (("#", "right"), ("File", "left"), ("Δ change", "right"),
+                      ("Hist.commits", "right"), ("Cx", "right"), ("Attention", "right")):
+        tbl.add_column(col, justify=just)
+    for i, it in enumerate(items, 1):
+        tbl.add_row(
+            str(i),
+            it.path,
+            f"+{it.added}/-{it.deleted}",
+            str(it.commits),
+            str(it.complexity),
+            Text(f"{it.attention:.1f}", style=_risk_style(it.attention, lo, hi)),
+        )
+    return Group(
+        Panel(head, title="GitLore — pre-merge review", border_style="cyan"), tbl
+    )
+
+
 def _heat(value: float, max_value: float) -> str:
     if max_value <= 0:
         return "#1e293b"
@@ -120,6 +249,38 @@ def html_report(stats: RepoStats, top: int = 50) -> str:
 <div class="card"><h2>Contributors</h2>
 <table><tr><th>Author</th><th>Commits</th><th>Added</th><th>Deleted</th></tr>
 {contrib_rows}</table></div>
+</body></html>"""
+
+
+def html_diff_report(review: "DiffReview", top: int = 50) -> str:
+    max_att = max((i.attention for i in review.items), default=1)
+    rows = "".join(
+        f"<tr style='background:{_heat(i.attention, max_att)}'>"
+        f"<td>{_esc(i.path)}</td>"
+        f"<td>+{i.added}/-{i.deleted}</td>"
+        f"<td>{i.commits}</td>"
+        f"<td>{i.complexity}</td>"
+        f"<td>{i.attention:.1f}</td></tr>"
+        for i in review.items[:top]
+    )
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitLore review — {_esc(review.diff_range)}</title>
+<style>
+ body{{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;background:#0f172a;color:#e2e8f0;padding:32px}}
+ h1{{font-size:22px}} h2{{font-size:16px;margin-top:28px;border-left:4px solid #38bdf8;padding-left:8px}}
+ table{{border-collapse:collapse;width:100%;font-size:13px;margin-top:8px}}
+ th,td{{text-align:left;padding:6px 10px}}
+ th{{color:#94a3b8;border-bottom:1px solid #334155}}
+ .meta{{color:#94a3b8;font-size:13px}}
+ .card{{background:#1e293b;border-radius:10px;padding:16px;margin-top:12px}}
+</style></head><body>
+<h1>GitLore — pre-merge review of <span style="color:#38bdf8">{_esc(review.diff_range)}</span></h1>
+<p class="meta">{len(review.items)} files changed · +{review.total_added}/-{review.total_deleted}</p>
+<div class="card"><h2>Review attention (change size × historical risk)</h2>
+<table><tr><th>File</th><th>Δ change</th><th>Hist.commits</th><th>Complexity</th><th>Attention</th></tr>
+{rows}</table></div>
 </body></html>"""
 
 

@@ -134,6 +134,31 @@ def get_commit_diff(repo: str, commit_hash: str) -> str:
     return _run(["show", "--no-color", commit_hash], repo=repo)
 
 
+def get_diff_files(repo: str, diff_range: str) -> list[FileChange]:
+    """Return per-file add/delete counts for a diff range.
+
+    `diff_range` is any git rev range accepted by `git diff`, e.g.
+    ``main...HEAD`` (what a PR would merge) or ``HEAD~1..HEAD``.
+    """
+    raw = _run(["diff", "--numstat", diff_range], repo=repo)
+    changes: list[FileChange] = []
+    for line in raw.splitlines():
+        if not line.strip():
+            continue
+        fields = line.split("\t")
+        if len(fields) < 3:
+            continue
+        add_s, del_s, path = fields[0], fields[1], fields[2]
+        changes.append(
+            FileChange(
+                path=path,
+                added=0 if add_s == "-" else _to_int(add_s),
+                deleted=0 if del_s == "-" else _to_int(del_s),
+            )
+        )
+    return changes
+
+
 def current_branch(repo: str = ".") -> str:
     return _run(["rev-parse", "--abbrev-ref", "HEAD"], repo=repo).strip()
 

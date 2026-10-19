@@ -52,6 +52,8 @@ turning raw `git log` into actionable signals:
 
 - 🚀 **Zero config** — runs on the repo you're already in.
 - 🔥 **Risk hotspots** ranked by churn × complexity.
+- 🔎 **Pre-merge review** (`--diff main...HEAD`) — rank the files in a change by
+  "review attention" so you know where to look before you merge.
 - 👥 **Contributor breakdown** (commits, additions, deletions).
 - 📈 **Activity sparkline** across the project's lifetime.
 - 🖥️ **Interactive TUI** (`--tui`) built with [Textual](https://textual.textualize.io).
@@ -75,14 +77,38 @@ turning raw `git log` into actionable signals:
 
 ```bash
 gitlore                         # pretty terminal summary (default)
-gitlore --top 30                # show more hotspots
+gitlore --top 30                # show more rows
 gitlore --since 2025-01-01      # only recent history
+gitlore --diff main...HEAD      # pre-merge review of a change
 gitlore --html report.html      # standalone shareable report
 gitlore --tui                   # interactive browser
 gitlore --json                  # machine-readable output
+gitlore --no-color              # disable colored output (great for piping)
+gitlore --skip docs,tests       # ignore extra path substrings
 gitlore --explain HEAD          # plain-English summary (needs key)
 gitlore --repo /path/to/repo    # analyze another repo
 ```
+
+The terminal output is colored automatically when you run it in a terminal,
+and falls back to plain text when piped. Force color handling with
+`--no-color`.
+
+### Pre-merge review in practice
+
+```bash
+gitlore --diff main...HEAD
+```
+
+Output ranks each file in the pending change by **attention** = the size of
+this change weighted by the file's historical risk — so a large edit to a
+fragile file outranks a large edit to a stable one. Pipe it, export it, or
+script it:
+
+```bash
+gitlore --diff main...HEAD --json | jq '.items[:5]'
+gitlore --diff main...HEAD --html review.html
+```
+
 
 The AI explainer works with any OpenAI-compatible endpoint:
 
