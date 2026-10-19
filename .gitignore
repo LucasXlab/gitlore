@@ -6,4 +6,3 @@ dist/
 build/
 *.egg-info/
 .pytest_cache/
-assets/demo.gif

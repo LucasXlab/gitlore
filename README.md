@@ -8,7 +8,9 @@
   </p>
 </p>
 
-![GitLore terminal demo](https://raw.githubusercontent.com/gitlore/gitlore/main/assets/demo.svg)
+![GitLore terminal demo](https://raw.githubusercontent.com/LucasYanzy/gitlore/main/assets/demo.gif)
+
+<sub>Recorded against the real [`psf/requests`](https://github.com/psf/requests) repository — 6,495 commits, 790 authors, 2011→2026. Regenerate with `python scripts/make_demo.py`.</sub>
 
 ## Install
 
