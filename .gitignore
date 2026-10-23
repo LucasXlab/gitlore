@@ -6,3 +6,10 @@ dist/
 build/
 *.egg-info/
 .pytest_cache/
+
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store

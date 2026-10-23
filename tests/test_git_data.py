@@ -26,6 +26,10 @@ def test_get_commit_diff(sample_repo):
     # git log returns newest-first, so commits[0] is the most recent ("add b")
     diff = git_data.get_commit_diff(str(sample_repo), commits[0].hash)
     assert "b.py" in diff or "def g" in diff
+    assert "diff --git" in diff
+    assert "Author:" not in diff
+    assert "dev@example.com" not in diff
+    assert "Dev One" not in diff
 
 
 def test_get_diff_files(sample_repo):

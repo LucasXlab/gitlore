@@ -1,38 +1,15 @@
-# Contributing to GitLore
+# Contributing
 
-Thanks for your interest! GitLore is a small, focused tool and welcomes
-contributions of all sizes.
+Start with a reproducible issue or a focused pull request. Describe the concrete input, expected behavior and observed behavior. Use synthetic data; do not attach personal config, private source code, request history, cookies or secrets.
 
-## Getting started
+## Local checks
 
 ```bash
-git clone https://github.com/gitlore/gitlore
-cd gitlore
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-pytest -q
+python3 -m pip install -e ".[dev]"
+python3 -m pytest -q
+python3 scripts/check_publication.py
 ```
 
-## How to contribute
+Keep runtime claims, CLI examples, package metadata and both README languages consistent. Regenerate the demo transcript with `python3 scripts/demo.py` when output changes. `scripts/render_assets.py` renders committed CLI output into images (requires Pillow).
 
-1. Open an issue (or comment on an existing one) before a large change.
-2. Fork, create a branch (`feat/...`, `fix/...`), make your change.
-3. Add/Update tests — core logic must stay covered.
-4. Run `pytest -q` and ensure it's green on your machine.
-5. Open a PR with a clear description of *why* and *what*.
-
-## Code style
-
-- Pure Python 3.10+, type hints where helpful.
-- Keep the core dependency-light: `rich` and `textual` only.
-  The AI explainer and its `openai` dependency must stay optional/lazy.
-- No network calls in the core path. Ever.
-
-## Good first issues
-
-See [`docs/good-first-issues.md`](docs/good-first-issues.md) for curated,
-well-scoped tasks labeled `good first issue`.
-
-## Code of conduct
-
-Be kind. Assume good intent. We want this to be a welcoming project.
+Use a project-scoped Git identity and a no-reply address when appropriate. Check the commit author and committer before pushing.

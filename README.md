@@ -1,160 +1,99 @@
-<p align="center">
-  <h1 align="center">GitLore</h1>
-  <p align="center"><b>Visualize your codebase's story from git history — churn, complexity hotspots, contributors, and timeline. Zero config.</b></p>
-  <p align="center">
-    <a href="https://github.com/LucasYanzy/gitlore/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
-    <a href="https://pypi.org/project/gitlore/"><img alt="PyPI" src="https://img.shields.io/pypi/v/gitlore.svg"></a>
-    <a href="https://github.com/LucasYanzy/gitlore/actions"><img alt="CI" src="https://github.com/LucasYanzy/gitlore/actions/workflows/ci.yml/badge.svg"></a>
-  </p>
-</p>
+<p align="center"><img src="assets/logo.svg" width="72" height="72" alt="GitLore logo"></p>
+<h1 align="center">GitLore</h1>
+<p align="center"><strong>Find review hotspots in unfamiliar Git histories.</strong></p>
 
-![GitLore terminal demo](https://raw.githubusercontent.com/LucasYanzy/gitlore/main/assets/demo.gif)
+[![CI](https://github.com/LucasYanzy/gitlore/actions/workflows/ci.yml/badge.svg)](https://github.com/LucasYanzy/gitlore/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Version](https://img.shields.io/badge/source-v0.1.0-6b7280.svg)](https://github.com/LucasYanzy/gitlore/blob/main/pyproject.toml) ![Runtime](https://img.shields.io/badge/Python-3.10%2B-3776ab.svg) [![Stars](https://img.shields.io/github/stars/LucasYanzy/gitlore?style=flat)](https://github.com/LucasYanzy/gitlore/stargazers)
 
-<sub>Recorded against the real [`psf/requests`](https://github.com/psf/requests) repository — 6,495 commits, 790 authors, 2011→2026. Regenerate with `python scripts/make_demo.py`.</sub>
+[English](README.md) · [简体中文](README.zh-CN.md)
 
-## Install
+![Real CLI output on synthetic fixtures](assets/demo.gif)
 
-```bash
-pip install gitlore
-```
-
-## Use it (zero config)
-
-```bash
-cd any-git-repo
-gitlore
-```
-
-That's it. No config file, no API key, no server. GitLore reads your git history
-and prints the story of your codebase: where the churn is, which files are
-riskiest to change, who built what, and how activity evolved over time.
-
-Want a shareable report? One flag:
-
-```bash
-gitlore --html report.html
-```
+The demo is captured from the real CLI using synthetic data. [Transcript](demo/terminal.txt) · regenerate with `python3 scripts/demo.py`.
 
 ## Why
 
-Every developer has stared at an unfamiliar repo — or a 200-file PR — and
-thought *"where do I even start?"* GitLore answers that in one command by
-turning raw `git log` into actionable signals:
+An unfamiliar repository has years of context hidden in Git. GitLore summarizes churn, a lightweight complexity estimate, contributors and activity so you can choose where to start reading.
 
-- **Risk hotspots** — files ranked by `churn × complexity`, i.e. things that
-  change often *and* are hard to reason about. The best places to review or
-  refactor first.
-- **Contributor map** — who owns what, by commit and by lines.
-- **Activity timeline** — commits-per-week sparkline, so you can see bursts,
-  stalls, and bus-factor at a glance.
-- **Optional AI explainer** — bring your own key and get a plain-English
-  summary of any commit (`gitlore --explain HEAD`).
+| Start with | Good for | Where GitLore helps |
+|---|---|---|
+| `git log` | Read commits in sequence | GitLore aggregates file hotspots and activity. |
+| `git shortlog` | Count contributors | GitLore combines contributors with churn and review signals. |
+
+## Quick start
+
+```bash
+git clone https://github.com/LucasYanzy/gitlore.git && cd gitlore
+python3 -m pip install .
+python3 scripts/demo.py
+```
+
+Requires Git and Python 3.10+. The install includes Rich and Textual. Optional AI support requires `python3 -m pip install ".[ai]"`; core analysis needs no API key. [Open the generated HTML example](demo/sample-report.html).
 
 ## Features
 
-- 🚀 **Zero config** — runs on the repo you're already in.
-- 🔥 **Risk hotspots** ranked by churn × complexity.
-- 🔎 **Pre-merge review** (`--diff main...HEAD`) — rank the files in a change by
-  "review attention" so you know where to look before you merge.
-- 👥 **Contributor breakdown** (commits, additions, deletions).
-- 📈 **Activity sparkline** across the project's lifetime.
-- 🖥️ **Interactive TUI** (`--tui`) built with [Textual](https://textual.textualize.io).
-- 📄 **Standalone HTML report** (`--html`) with a heatmap — no JS, no tracking.
-- 🤖 **BYOK AI explainer** (`--explain`) for any commit, OpenAI-compatible.
-- 📦 **Machine-readable JSON** (`--json`) for piping into other tools.
-- 🪶 **Pure Python + `git`**, no heavy native deps for the core.
+### Rank hotspots
 
-## Comparison
+Combine churn and a heuristic complexity estimate. Scores prioritize attention; they are not defect probabilities.
 
-| | GitLore | gource | gitk / tig | VS Code Git Graph |
-|---|---|---|---|---|
-| Zero config | ✅ | ❌ (needs OpenGL) | ⚠️ GUI / log only | ❌ (needs editor) |
-| Risk hotspots | ✅ | ❌ | ❌ | ❌ |
-| Contributor map | ✅ | ⚠️ visual only | ❌ | ⚠️ |
-| HTML report | ✅ | ❌ | ❌ | ❌ |
-| AI explain | ✅ (BYOK) | ❌ | ❌ | ❌ |
-| Terminal-first | ✅ | ❌ | ✅ | ❌ |
+### Review a branch
 
-## Commands
+`--diff main...HEAD` weights changed files by historical risk to suggest a reading order.
+
+### Share a report
+
+Export standalone HTML or JSON, or explore the repository in the Textual TUI.
+
+### Explain on request
+
+`--explain` is optional and uses your configured API endpoint. It sends a commit patch only when explicitly selected.
+
+![CLI result](assets/demo.png)
+
+## Usage
 
 ```bash
-gitlore                         # pretty terminal summary (default)
-gitlore --top 30                # show more rows
-gitlore --since 2025-01-01      # only recent history
-gitlore --diff main...HEAD      # pre-merge review of a change
-gitlore --html report.html      # standalone shareable report
-gitlore --tui                   # interactive browser
-gitlore --json                  # machine-readable output
-gitlore --no-color              # disable colored output (great for piping)
-gitlore --skip docs,tests       # ignore extra path substrings
-gitlore --explain HEAD          # plain-English summary (needs key)
-gitlore --repo /path/to/repo    # analyze another repo
-```
-
-The terminal output is colored automatically when you run it in a terminal,
-and falls back to plain text when piped. Force color handling with
-`--no-color`.
-
-### Pre-merge review in practice
-
-```bash
+gitlore --repo /path/to/project
+gitlore --since 2026-01-01 --top 10
 gitlore --diff main...HEAD
+gitlore --html report.html
+gitlore --json
+gitlore --tui
 ```
 
-Output ranks each file in the pending change by **attention** = the size of
-this change weighted by the file's historical risk — so a large edit to a
-fragile file outranks a large edit to a stable one. Pipe it, export it, or
-script it:
+## Architecture
+
+```mermaid
+flowchart LR
+A[Local Git history] --> B[Churn / contributors / timeline]
+C[Tracked source files] --> D[Complexity estimate]
+B --> E[Hotspot and review ranking]
+D --> E
+E --> F[Terminal / TUI / HTML / JSON]
+G[Explicit commit patch] -. --explain .-> H[Configured API endpoint]
+```
+
+## Privacy and limits
+
+Core analysis stays local. HTML/JSON reports include repository paths and contributor names and must be reviewed before sharing. `--explain` sends up to 12,000 patch characters to the configured endpoint; file contents may contain sensitive data. Installing dependencies can access package registries. See [PRIVACY.md](PRIVACY.md) for data boundaries.
+
+## Development
 
 ```bash
-gitlore --diff main...HEAD --json | jq '.items[:5]'
-gitlore --diff main...HEAD --html review.html
+python3 -m pip install -e ".[dev]"
+python3 -m pytest -q
 ```
 
-
-The AI explainer works with any OpenAI-compatible endpoint:
-
-```bash
-export OPENAI_API_KEY=sk-...
-gitlore --explain abc123 --model gpt-4o-mini
-# or point at a local gateway:
-gitlore --explain HEAD --base-url http://localhost:11434/v1
-```
-
-## FAQ
-
-**Does GitLore send my code anywhere?**
-No. The core runs entirely locally on your machine. The `--explain` feature
-only contacts the API *you* configure, using *your* key, and only sends the
-single commit diff you asked about.
-
-**What about private repos?**
-GitLore only reads local git metadata and your working tree. Nothing leaves
-your machine unless you opt into `--explain`.
-
-**Does it need a server or database?**
-No server, no database, no config file. Pure CLI/TUI.
-
-**Will it be slow on big repos?**
-GitLore streams `git log` and ignores `node_modules`, `dist`, `.venv`, etc.
-by default. For very large histories, `--since` or `--max-count` narrow the scope.
-
-**Which Python versions are supported?**
-3.10+.
+The demo uses a temporary fixture and does not inspect your personal repositories or agent homes.
 
 ## Roadmap
 
-- [ ] Language-aware complexity (real cyclomatic estimate per ecosystem)
-- [ ] Branch / PR-focused diff risk before you hit "merge"
-- [ ] `--tui` drill-down into a single file's history
-- [ ] Export to SVG/PNG for slides
-- [ ] GitLore as a pre-commit / CI check (fail on new hotspots)
+- [ ] Improve language-aware complexity estimates.
+- [ ] Add interactive per-file history drill-down.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Good first issues are tagged
-[`good first issue`](https://github.com/LucasYanzy/gitlore/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+Read [CONTRIBUTING.md](CONTRIBUTING.md). Report reproducible problems in [Issues](https://github.com/LucasYanzy/gitlore/issues). Follow [SECURITY.md](SECURITY.md) for sensitive reports.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE).

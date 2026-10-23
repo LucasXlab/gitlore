@@ -1,0 +1,24 @@
+$ gitlore --no-color
+
+GitLore — codebase story
+============================================================
+Repository : .
+Commits    : 3
+Authors    : 1
+Files      : 4
+Range      : 2026-09-01 → 2026-09-15
+
+Activity (commits/week): ███
+
+Top 15 risk hotspots (churn × complexity):
+------------------------------------------------------------
+ 1. src/core.py                                risk=     5.8 commits=2    churn=4       cx=5
+ 2. src/app.py                                 risk=     5.4 commits=2    churn=6       cx=3
+ 3. tests/test_core.py                         risk=     1.8 commits=1    churn=4       cx=2
+ 4. README.md                                  risk=     0.0 commits=1    churn=3       cx=0
+
+Top contributors:
+------------------------------------------------------------
+  Demo Contributor               commits=3     +16/-1
+
+HTML report: demo/sample-report.html

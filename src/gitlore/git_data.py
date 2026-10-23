@@ -131,7 +131,12 @@ def get_commits(
 
 def get_commit_diff(repo: str, commit_hash: str) -> str:
     """Return the textual diff of a single commit (used by the AI explainer)."""
-    return _run(["show", "--no-color", commit_hash], repo=repo)
+    # The explainer needs the patch, not the author's identity or commit metadata.
+    # Avoid invoking user-configured diff helpers while preparing outbound data.
+    return _run(
+        ["show", "--format=", "--no-ext-diff", "--no-textconv", "--no-color", commit_hash],
+        repo=repo,
+    )
 
 
 def get_diff_files(repo: str, diff_range: str) -> list[FileChange]:
