@@ -2,7 +2,7 @@
 <h1 align="center">GitLore</h1>
 <p align="center"><strong>从陌生仓库的 Git 历史中找到值得优先审阅的位置。</strong></p>
 
-[![CI](https://github.com/LucasYanzy/gitlore/actions/workflows/ci.yml/badge.svg)](https://github.com/LucasYanzy/gitlore/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Version](https://img.shields.io/badge/source-v0.1.0-6b7280.svg)](https://github.com/LucasYanzy/gitlore/blob/main/pyproject.toml) ![Runtime](https://img.shields.io/badge/Python-3.10%2B-3776ab.svg) [![Stars](https://img.shields.io/github/stars/LucasYanzy/gitlore?style=flat)](https://github.com/LucasYanzy/gitlore/stargazers)
+[![CI](https://github.com/LucasXlab/gitlore/actions/workflows/ci.yml/badge.svg)](https://github.com/LucasXlab/gitlore/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Version](https://img.shields.io/badge/source-v0.1.0-6b7280.svg)](https://github.com/LucasXlab/gitlore/blob/main/pyproject.toml) ![Runtime](https://img.shields.io/badge/Python-3.10%2B-3776ab.svg) [![Stars](https://img.shields.io/github/stars/LucasYanzy/gitlore?style=flat)](https://github.com/LucasXlab/gitlore/stargazers)
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
@@ -17,7 +17,7 @@
 ## 快速开始
 
 ```bash
-git clone https://github.com/LucasYanzy/gitlore.git && cd gitlore
+git clone https://github.com/LucasXlab/gitlore.git && cd gitlore
 python3 -m pip install .
 python3 scripts/demo.py
 ```

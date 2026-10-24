@@ -9,7 +9,7 @@ pushing a `v*` **tag**.
 1. Go to https://pypi.org/manage/account/publishing/ and add a **Trusted
    Publisher**:
    - PyPI project name: `gitlore`
-   - Owner: `LucasYanzy`
+   - Owner: `LucasXlab`
    - Repository name: `gitlore`
    - Workflow name: `publish.yml`
    - Environment name: `pypi`

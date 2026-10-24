@@ -2,7 +2,7 @@
 <h1 align="center">GitLore</h1>
 <p align="center"><strong>Find review hotspots in unfamiliar Git histories.</strong></p>
 
-[![CI](https://github.com/LucasYanzy/gitlore/actions/workflows/ci.yml/badge.svg)](https://github.com/LucasYanzy/gitlore/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Version](https://img.shields.io/badge/source-v0.1.0-6b7280.svg)](https://github.com/LucasYanzy/gitlore/blob/main/pyproject.toml) ![Runtime](https://img.shields.io/badge/Python-3.10%2B-3776ab.svg) [![Stars](https://img.shields.io/github/stars/LucasYanzy/gitlore?style=flat)](https://github.com/LucasYanzy/gitlore/stargazers)
+[![CI](https://github.com/LucasXlab/gitlore/actions/workflows/ci.yml/badge.svg)](https://github.com/LucasXlab/gitlore/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Version](https://img.shields.io/badge/source-v0.1.0-6b7280.svg)](https://github.com/LucasXlab/gitlore/blob/main/pyproject.toml) ![Runtime](https://img.shields.io/badge/Python-3.10%2B-3776ab.svg) [![Stars](https://img.shields.io/github/stars/LucasYanzy/gitlore?style=flat)](https://github.com/LucasXlab/gitlore/stargazers)
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
@@ -22,7 +22,7 @@ An unfamiliar repository has years of context hidden in Git. GitLore summarizes 
 ## Quick start
 
 ```bash
-git clone https://github.com/LucasYanzy/gitlore.git && cd gitlore
+git clone https://github.com/LucasXlab/gitlore.git && cd gitlore
 python3 -m pip install .
 python3 scripts/demo.py
 ```
@@ -92,7 +92,7 @@ The demo uses a temporary fixture and does not inspect your personal repositorie
 
 ## Contributing
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md). Report reproducible problems in [Issues](https://github.com/LucasYanzy/gitlore/issues). Follow [SECURITY.md](SECURITY.md) for sensitive reports.
+Read [CONTRIBUTING.md](CONTRIBUTING.md). Report reproducible problems in [Issues](https://github.com/LucasXlab/gitlore/issues). Follow [SECURITY.md](SECURITY.md) for sensitive reports.
 
 ## License
 
