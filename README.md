@@ -57,6 +57,7 @@ gitlore --since 2026-01-01 --top 10
 gitlore --diff main...HEAD
 gitlore --html report.html
 gitlore --json
+gitlore --csv report.csv
 gitlore --tui
 ```
 
