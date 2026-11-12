@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import argparse
+import csv
+import io
 import json
 import sys
 from typing import Optional
@@ -34,6 +36,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--html", metavar="PATH", help="Write a standalone HTML report to PATH")
     p.add_argument("--tui", action="store_true", help="Open the interactive terminal UI")
     p.add_argument("--json", action="store_true", help="Output machine-readable JSON")
+    p.add_argument("--csv", metavar="PATH", help="Write a CSV report to PATH")
     p.add_argument("--no-color", action="store_true", help="Disable colored output")
     p.add_argument(
         "--diff",
@@ -115,6 +118,33 @@ def _to_dict(stats: analysis.RepoStats) -> dict:
     }
 
 
+def _stats_to_csv(stats: analysis.RepoStats) -> str:
+    out = io.StringIO()
+    writer = csv.writer(out)
+    writer.writerow(["# GitLore CSV report"])
+    writer.writerow(["# repo", stats.repo])
+    writer.writerow(["# total_commits", stats.total_commits])
+    writer.writerow(["# total_authors", stats.total_authors])
+    writer.writerow(["# total_files", stats.total_files])
+    writer.writerow(["# first_commit", stats.first_commit.isoformat() if stats.first_commit else None])
+    writer.writerow(["# last_commit", stats.last_commit.isoformat() if stats.last_commit else None])
+    writer.writerow([])
+    writer.writerow(["path", "risk", "commits", "churn", "complexity"])
+    for f in stats.files:
+        writer.writerow([f.path, round(f.risk, 2), f.commits, f.churn, f.complexity])
+    writer.writerow([])
+    writer.writerow(["# contributors"])
+    writer.writerow(["name", "commits", "added", "deleted"])
+    for c in stats.contributors:
+        writer.writerow([c.name, c.commits, c.added, c.deleted])
+    writer.writerow([])
+    writer.writerow(["# timeline"])
+    writer.writerow(["week", "commits"])
+    for t in stats.timeline:
+        writer.writerow([t.week, t.commits])
+    return out.getvalue()
+
+
 def _diff_to_dict(review: analysis.DiffReview) -> dict:
     return {
         "repo": review.repo,
@@ -137,6 +167,22 @@ def _diff_to_dict(review: analysis.DiffReview) -> dict:
     }
 
 
+def _diff_to_csv(review: analysis.DiffReview) -> str:
+    out = io.StringIO()
+    writer = csv.writer(out)
+    writer.writerow(["# GitLore CSV report (diff review)"])
+    writer.writerow(["# repo", review.repo])
+    writer.writerow(["# diff_range", review.diff_range])
+    writer.writerow(["# files_changed", len(review.items)])
+    writer.writerow(["# total_added", review.total_added])
+    writer.writerow(["# total_deleted", review.total_deleted])
+    writer.writerow([])
+    writer.writerow(["path", "added", "deleted", "commits", "complexity", "risk", "attention"])
+    for i in review.items:
+        writer.writerow([i.path, i.added, i.deleted, i.commits, i.complexity, round(i.risk, 2), round(i.attention, 2)])
+    return out.getvalue()
+
+
 def _run_diff(args: argparse.Namespace) -> int:
     try:
         commits = git_data.get_commits(repo=args.repo)
@@ -154,6 +200,11 @@ def _run_diff(args: argparse.Namespace) -> int:
     )
     if args.json:
         print(json.dumps(_diff_to_dict(review), indent=2))
+        return 0
+    if args.csv:
+        with open(args.csv, "w", encoding="utf-8", newline="") as fh:
+            fh.write(_diff_to_csv(review))
+        print(f"CSV review written to {args.csv}")
         return 0
     if args.html:
         with open(args.html, "w", encoding="utf-8") as fh:
@@ -214,7 +265,11 @@ def main(argv: Optional[list[str]] = None) -> int:
     if args.json:
         print(json.dumps(_to_dict(stats), indent=2))
         return 0
-
+    if args.csv:
+        with open(args.csv, "w", encoding="utf-8", newline="") as fh:
+            fh.write(_stats_to_csv(stats))
+        print(f"CSV report written to {args.csv}")
+        return 0
     if args.html:
         with open(args.html, "w", encoding="utf-8") as fh:
             fh.write(report.html_report(stats, top=max(args.top, 50)))
